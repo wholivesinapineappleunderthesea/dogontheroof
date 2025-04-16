@@ -5,7 +5,9 @@ project(dogontheroof
         LANGUAGES CXX C
         )
 
-add_executable(dogontheroof src/main.cc)
+# glob src/ for .cc files
+file(GLOB_RECURSE SRC_FILES src/*.cc)
+add_executable(dogontheroof ${SRC_FILES})
 
 set_target_properties(dogontheroof PROPERTIES CXX_STANDARD 23)
 set_target_properties(dogontheroof PROPERTIES CXX_STANDARD_REQUIRED ON)
@@ -35,4 +37,30 @@ endif()
 target_link_libraries(dogontheroof
         PRIVATE
         wgpu_native
+        )
+
+# set APOSBUILDDEBUG if debug
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Setting APOSBUILDDEBUG")
+    target_compile_definitions(dogontheroof
+            PRIVATE
+            APOSBUILDDEBUG
+            )
+endif()
+
+# precompiled headers
+target_precompile_headers(dogontheroof
+        PRIVATE
+        src/ApostatePCH.h
+        )
+
+# glfw
+add_subdirectory(glfw)
+target_link_libraries(dogontheroof
+        PRIVATE
+        glfw
+        )
+target_include_directories(dogontheroof
+        PRIVATE
+        glfw/include
         )
